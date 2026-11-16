@@ -34,16 +34,15 @@ update and activity names and payloads) as the other ports:
 
 ## What this port leaves out
 
-Two of the PRD's optional components are **not included** yet:
+One of the PRD's optional components is **not included** yet: the claim check (`USE_CLAIM_CHECK`) and
+its codec server.
 
-* the Java open-account worker (`java/`);
-* the claim check (`USE_CLAIM_CHECK`) and its codec server.
+The other two are included:
 
-The worker still honours `TEMPORAL_TASK_QUEUE_OPEN_ACCOUNT` (see `scripts/startlocalworker.sh <queue>`),
-so another port's Java worker can run the open-account workflow.
-
-The Temporal Cloud scripts are included: see
-[Running the demo on Temporal Cloud](docs/temporal.md#running-the-demo-on-temporal-cloud).
+* the [Java open-account worker](java/README.md), shared with the other ports, which can run
+  `OpenInvestmentAccountWorkflow` in place of the Go version;
+* the Temporal Cloud scripts: see
+  [Running the demo on Temporal Cloud](docs/temporal.md#running-the-demo-on-temporal-cloud).
 
 ## Prerequisites
 
@@ -52,6 +51,7 @@ The Temporal Cloud scripts are included: see
 * [Redis](https://redis.io/docs/latest/operate/oss_and_stack/install/) 7 or later, on localhost:6379
 * [Node.js](https://nodejs.org/en/download) 18 or later, with npm, for the web UI
 * A [Gemini API key](https://aistudio.google.com/apikey)
+* Optional, for the Java open-account worker: [JDK 25](https://adoptium.net/)
 
 ## Set up your Gemini API key
 
@@ -101,6 +101,7 @@ Python ports' `src/` layout. This table maps one to the other:
 | [scripts](scripts) | Start scripts | the `.sh` files in `src/` |
 | [frontend](frontend) | Copy of the shared React app | `src/frontend/` |
 | [tests](tests) | Live tests | `tests/live_*` |
+| [java](java) | Optional Java open-account worker, copied unchanged from the reference | `java/` |
 | [data](data) | Demo data, unchanged from the reference | `data/` |
 
 The default tests live next to the code they test (`*_test.go`), as is usual in Go.

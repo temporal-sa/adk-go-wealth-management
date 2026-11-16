@@ -178,6 +178,22 @@ open-account workflow onto another task queue, as `startlocalworker.sh <queue>` 
   succeed. Transfers use the IDs `<workflow ID>-<run ID>-initial-deposit` and `...-refund`, so a
   retried transfer never moves money twice.
 
+### With the Java open-account workflow
+
+The optional [Java worker](../java/README.md) runs `OpenInvestmentAccountWorkflow` on its own task
+queue and calls this port's activities by name. Start the Go worker with the queue name, then the Java
+worker with the same name:
+
+```bash
+./scripts/startlocalworker.sh Open-Account-Java
+```
+
+```bash
+cd java && ./startlocalworker.sh Open-Account-Java
+```
+
+The Java version has its own bug in workflow code: see the [Java README](../java/README.md).
+
 ### Testing the open-account workflow on its own
 
 The open-account runner runs `OpenInvestmentAccountWorkflow` directly, with no chat and no model key,
@@ -187,6 +203,9 @@ starts its own worker and stops it on exit:
 ```bash
 ./scripts/startlocalopenaccount.sh
 ```
+
+To run them on the Java worker instead, start it first (above), then pass its queue name:
+`./scripts/startlocalopenaccount.sh Open-Account-Java`.
 
 When the third scenario waits for compliance approval, send it from another terminal:
 
@@ -291,6 +310,12 @@ The web UI's smoke test:
 
 ```bash
 cd frontend && npm install && CI=true npm test
+```
+
+The Java worker's own tests (JDK 25):
+
+```bash
+cd java && ./gradlew clean build && ./gradlew test
 ```
 
 The live tests call the real Gemini API, so they are kept out of the default run. They run the real
