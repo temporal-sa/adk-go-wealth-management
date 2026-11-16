@@ -1,5 +1,6 @@
 /setgeminikey.sh
 /setcloudenv.sh
+/setclaimcheck.sh
 .idea
 .vscode
 .DS_Store

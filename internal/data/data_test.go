@@ -1,34 +1,26 @@
-package data
+package data_test
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/temporal-sa/adk-go-wealth-management/internal/data"
 	"github.com/temporal-sa/adk-go-wealth-management/internal/domain"
+	"github.com/temporal-sa/adk-go-wealth-management/internal/testfixtures"
 )
 
 func TestMoney(t *testing.T) {
-	assert.Equal(t, "$1,234.50", Money(1234.5))
-	assert.Equal(t, "$100.00", Money(100))
-	assert.Equal(t, "$1,000,000.00", Money(1_000_000))
-	assert.Equal(t, "$13,000.00", Money(13000))
-	assert.Equal(t, "$0.07", Money(0.07))
+	assert.Equal(t, "$1,234.50", data.Money(1234.5))
+	assert.Equal(t, "$100.00", data.Money(100))
+	assert.Equal(t, "$1,000,000.00", data.Money(1_000_000))
+	assert.Equal(t, "$13,000.00", data.Money(13000))
+	assert.Equal(t, "$0.07", data.Money(0.07))
 }
 
-func testStore(t *testing.T) *Store {
-	dir := t.TempDir()
-	for _, f := range []string{"beneficiaries.json", "clients.json", "funding_accounts.json", "investments.json"} {
-		b, err := os.ReadFile(filepath.Join("..", "..", "data", f))
-		require.NoError(t, err)
-		require.NoError(t, os.WriteFile(filepath.Join(dir, f), b, 0o644))
-	}
-	return NewStore(dir)
-}
+func testStore(t *testing.T) *data.Store { return testfixtures.Store(t) }
 
 func TestDemoData(t *testing.T) {
 	s := testStore(t)
@@ -55,7 +47,7 @@ func TestTransfersAreIdempotent(t *testing.T) {
 	assert.Equal(t, 249000.0, again.BalanceAfter)
 
 	_, err = s.Debit("123", 300000, "t-2")
-	assert.True(t, errors.Is(err, ErrInsufficientFunds))
+	assert.True(t, errors.Is(err, data.ErrInsufficientFunds))
 }
 
 func TestBeneficiariesAndClients(t *testing.T) {

@@ -3,8 +3,6 @@ package workflows
 import (
 	"context"
 	"iter"
-	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -23,6 +21,7 @@ import (
 	"github.com/temporal-sa/adk-go-wealth-management/internal/data"
 	"github.com/temporal-sa/adk-go-wealth-management/internal/domain"
 	"github.com/temporal-sa/adk-go-wealth-management/internal/eventstream"
+	"github.com/temporal-sa/adk-go-wealth-management/internal/testfixtures"
 )
 
 const testModel = "scripted-model"
@@ -82,20 +81,8 @@ func transfer(agentName string) *model.LLMResponse {
 
 func text(s string) *model.LLMResponse { return googleadk.TextResponse(s) }
 
-// copyData copies the demo data into a temporary directory, so tests don't change data/.
-func copyData(t *testing.T) *data.Store {
-	t.Helper()
-	dir := t.TempDir()
-	src := filepath.Join("..", "..", "data")
-	entries, err := os.ReadDir(src)
-	require.NoError(t, err)
-	for _, e := range entries {
-		b, err := os.ReadFile(filepath.Join(src, e.Name()))
-		require.NoError(t, err)
-		require.NoError(t, os.WriteFile(filepath.Join(dir, e.Name()), b, 0o644))
-	}
-	return data.NewStore(dir)
-}
+// copyData returns a data store on a fresh copy of the demo data, so tests don't change data/.
+func copyData(t *testing.T) *data.Store { return testfixtures.Store(t) }
 
 // fakeChaos is a chaos.Source whose flags the test sets. A flag can be on for only its
 // first n checks, so an outage ends by itself.

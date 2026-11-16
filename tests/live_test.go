@@ -16,7 +16,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -39,6 +38,7 @@ import (
 	"github.com/temporal-sa/adk-go-wealth-management/internal/domain"
 	"github.com/temporal-sa/adk-go-wealth-management/internal/eventstream"
 	"github.com/temporal-sa/adk-go-wealth-management/internal/llm"
+	"github.com/temporal-sa/adk-go-wealth-management/internal/testfixtures"
 	"github.com/temporal-sa/adk-go-wealth-management/internal/workflows"
 )
 
@@ -173,16 +173,4 @@ func chat(t *testing.T, c client.Client, id string, messages []string) ([]domain
 	return history, states
 }
 
-func copyData(t *testing.T) *data.Store {
-	t.Helper()
-	dir := t.TempDir()
-	src := filepath.Join("..", "data")
-	entries, err := os.ReadDir(src)
-	require.NoError(t, err)
-	for _, e := range entries {
-		b, err := os.ReadFile(filepath.Join(src, e.Name()))
-		require.NoError(t, err)
-		require.NoError(t, os.WriteFile(filepath.Join(dir, e.Name()), b, 0o644))
-	}
-	return data.NewStore(dir)
-}
+func copyData(t *testing.T) *data.Store { return testfixtures.Store(t) }

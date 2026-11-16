@@ -110,8 +110,11 @@ See [Failure scenarios](../docs/temporal.md#failure-scenarios) for the other sce
 
 ## Claim check
 
-The Java code supports the reference's Redis claim check (`USE_CLAIM_CHECK`), but this port doesn't
-implement the claim check yet, so leave it off: the Go worker couldn't read the Java worker's payloads.
+The start scripts source `../setclaimcheck.sh` if it exists, so with the claim check on (see
+[docs/temporal.md](../docs/temporal.md#claim-check-optional)) the Java worker uses the same Redis
+claim-check codec as the Go components. Locally, it uses the Redis at `spring.data.redis` in
+`application.yaml` (`localhost:6379`), not `REDIS_HOST` / `REDIS_PORT`; with the Cloud profile, it uses
+`REDIS_HOST` / `REDIS_PORT`.
 
 ## Tests
 

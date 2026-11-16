@@ -106,6 +106,57 @@ Then send the approval, quoting the ID:
 Ask the agent for the status: it reads it with `get_account_opening_status`, and reports
 `Complete`.
 
+## Claim check (optional)
+
+The claim check substitutes every payload sent to Temporal (workflow and activity inputs and results,
+signals, queries and updates) with an ID. This is the
+[Claim Check pattern](https://www.enterpriseintegrationpatterns.com/patterns/messaging/StoreInLibrary.html).
+A [payload codec](https://docs.temporal.io/develop/go/converters-and-encryption#custom-payload-codec)
+([internal/claimcheck](../internal/claimcheck/claimcheck.go)) stores the original payload in Redis under
+a new UUID, and puts only the UUID in the event history. Its format matches the other ports' Python and
+Java codecs, so the Java worker works with it too.
+
+To turn it on, from the repository root:
+
+```bash
+cp setclaimcheck.example setclaimcheck.sh
+```
+
+`setclaimcheck.sh` sets `USE_CLAIM_CHECK=true` and where Redis is. It is git-ignored. Every start
+script sources it if it exists, so the worker, the API, the compliance and open-account scripts, the
+codec server and the Java worker all use the codec. They must: a component without it can't read the
+others' payloads. Restart anything already running after you create or delete the file.
+
+The demo uses one Redis for the chat events, the chaos flags and the claim check. A claim check adds a
+Redis call for every payload, and Redis being down then stops the workflows, so use a reliable Redis in
+production. The stored payloads have no expiry: clear them with `redis-cli flushdb` when the demo is
+done (this also clears the chat events and chaos flags).
+
+### Codec server
+
+With the claim check on, the Temporal UI only shows each payload's UUID. The codec server lets it show
+the real data. Start it:
+
+```bash
+./scripts/startcodecserver.sh
+```
+
+It listens on http://127.0.0.1:8081 (`CODEC_SERVER_ADDRESS` changes it). Open the Temporal UI at exactly
+http://localhost:8233 (not 127.0.0.1), or https://cloud.temporal.io for Temporal Cloud: the codec server
+only accepts requests from those origins. Click the glasses icon at the top right, choose **Use my browser
+setting and ignore Cluster-level setting**, enter `http://127.0.0.1:8081` with no trailing spaces, turn
+off **Pass the user access token** and **Include cross-origin credentials**, and click **Apply**.
+
+![Codec server settings](../images/config-codec-server.png)
+
+The UI now shows the decoded payloads:
+
+![Decoded input](../images/decoded-input.png)
+
+Without the codec server, it shows only the Base64-encoded ID:
+
+![Encoded input](../images/encoded-input.png)
+
 ## Running the demo on Temporal Cloud
 
 The worker, the API and the compliance script read the Temporal connection from the environment.
@@ -230,6 +281,8 @@ Scenario 2 changes Don Doe's last name to Doenut, so reset the data afterwards w
 | `LLM_MAX_CALLS_PER_SECOND` | unlimited | worker | Rate limit the Temporal service applies to model calls, across all workers |
 | `REDIS_URL` | none | worker, API | `redis://:<password>@<host>:<port>/<db>`; wins over the three below |
 | `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD` | `localhost`, `6379`, none | worker, API | Where Redis is |
+| `USE_CLAIM_CHECK` | off | all | `true`, `yes` or `1` turns on the claim-check codec. Set in `setclaimcheck.sh`. |
+| `CODEC_SERVER_ADDRESS` | `127.0.0.1:8081` | codec server | Where the codec server listens |
 | `DATA_DIR` | `data/` above the working directory | worker, CLI | Folder of the demo data files |
 | `API_ADDRESS` | `127.0.0.1:8000` | API | Where the API listens |
 | `LIVE_TEST_RUNS` | `1` | live tests | How many times each live test repeats its conversation |
@@ -305,6 +358,7 @@ It covers:
 | `TestKYCGuardAndRepeatOpening` | `approve_kyc` refuses until this opening's details were shown in an earlier turn; two "Vacation" openings start `-Vacation-1` and `-Vacation-2`, each with its own KYC |
 | `TestClientIDSharedAcrossAgents` | Every agent is told the client ID once a tool has used it; handoffs happen in one turn |
 | `TestOffTopicPrompt` (both versions), `TestPRDPromptLines` | The Supervisor Agent's prompt declines off-topic questions; the PRD's required prompt lines |
+| `TestFormat`, `TestDecodeOtherPorts`, `TestDataConverterRoundTrip` | The claim-check payload format, decoding the Python and Java codecs' payloads, and a round trip (with an in-memory Redis) |
 
 The web UI's smoke test:
 

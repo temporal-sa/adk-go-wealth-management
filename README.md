@@ -32,15 +32,14 @@ update and activity names and payloads) as the other ports:
 | Pydantic | Pydantic AI | Python | [temporal-sa/pyai-wealth-management](https://github.com/temporal-sa/pyai-wealth-management) |
 | Strands | Strands Agents | Python | [temporal-sa/strands-wealth-management](https://github.com/temporal-sa/strands-wealth-management) |
 
-## What this port leaves out
+## Optional components
 
-One of the PRD's optional components is **not included** yet: the claim check (`USE_CLAIM_CHECK`) and
-its codec server.
-
-The other two are included:
+All three of the PRD's optional components are included:
 
 * the [Java open-account worker](java/README.md), shared with the other ports, which can run
   `OpenInvestmentAccountWorkflow` in place of the Go version;
+* the [claim check and codec server](docs/temporal.md#claim-check-optional), which store payloads
+  in Redis instead of Temporal's event history;
 * the Temporal Cloud scripts: see
   [Running the demo on Temporal Cloud](docs/temporal.md#running-the-demo-on-temporal-cloud).
 
@@ -93,6 +92,7 @@ Python ports' `src/` layout. This table maps one to the other:
 | [cmd/cli](cmd/cli), [internal/standalone](internal/standalone) | The standalone command-line chat | `src/adk_supervisor/` |
 | [cmd/openaccount](cmd/openaccount) | The open-account runner | `src/temporal_supervisor/run_open_account_workflow.py` |
 | [cmd/compliance](cmd/compliance) | Sends compliance approval | `src/temporal_supervisor/run_send_compliance_approval.py` |
+| [cmd/codecserver](cmd/codecserver), [internal/claimcheck](internal/claimcheck) | The claim-check codec and its codec server | `src/temporal_supervisor/claim_check/`, `codec_server/` |
 | [internal/workflows](internal/workflows) | The chat and open-account workflows, and the agents' tools | `src/temporal_supervisor/workflows/` |
 | [internal/activities](internal/activities) | The activities | `src/temporal_supervisor/activities/` |
 | [internal/agents](internal/agents), [internal/prompts](internal/prompts) | The agent tree and prompts, shared by both versions | `src/common/agent_constants.py` |

@@ -11,6 +11,9 @@ import (
 
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/contrib/envconfig"
+
+	"github.com/temporal-sa/adk-go-wealth-management/internal/claimcheck"
+	"github.com/temporal-sa/adk-go-wealth-management/internal/redisx"
 )
 
 // DefaultGeminiModel matches the Python ADK port's default.
@@ -52,7 +55,8 @@ func Load() Config {
 
 // ClientOptions returns the Temporal client options from the environment (TEMPORAL_ADDRESS,
 // TEMPORAL_NAMESPACE, TLS settings, or a temporal.toml profile), defaulting to a local
-// development server at 127.0.0.1:7233.
+// development server at 127.0.0.1:7233. With USE_CLAIM_CHECK on, payloads go through the
+// claim-check codec, stored in Redis.
 func ClientOptions() (client.Options, error) {
 	opts, err := envconfig.LoadDefaultClientOptions()
 	if err != nil {
@@ -61,8 +65,14 @@ func ClientOptions() (client.Options, error) {
 	if opts.HostPort == "" {
 		opts.HostPort = "127.0.0.1:7233"
 	}
+	if UseClaimCheck() {
+		opts.DataConverter = claimcheck.DataConverter(redisx.NewClient())
+	}
 	return opts, nil
 }
+
+// UseClaimCheck reports whether the claim-check codec is on (USE_CLAIM_CHECK is true, yes or 1).
+func UseClaimCheck() bool { return Bool("USE_CLAIM_CHECK") }
 
 // Bool reports whether an environment variable is set to true, yes or 1.
 func Bool(name string) bool {
