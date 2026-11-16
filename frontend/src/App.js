@@ -27,7 +27,7 @@ function App() {
   let [isPolling, setIsPolling] = useState(false);
   const [isWaitingForAIResponse, setIsWaitingForAIResponse] = useState(false);
   const defaultHeaderText = 'Chat session started.';
-  const workflow_id_prefix = 'oai-temporal-agent-';
+  const workflow_id_prefix = 'adk-go-temporal-agent-';
   const [workflow_id, setWorkflowId] = useState('');
   const [showChaos, setShowChaos] = useState(loadShowChaos);
 
