@@ -1,4 +1,5 @@
 /setgeminikey.sh
+/setcloudenv.sh
 .idea
 .vscode
 .DS_Store

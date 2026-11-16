@@ -34,16 +34,16 @@ update and activity names and payloads) as the other ports:
 
 ## What this port leaves out
 
-The PRD's optional components are **not included** in this phase:
+Two of the PRD's optional components are **not included** yet:
 
 * the Java open-account worker (`java/`);
-* the claim check (`USE_CLAIM_CHECK`) and its codec server;
-* the Temporal Cloud scripts (`startcloudworker.sh`, `startcloudapi.sh`, `cloudsendcomplianceapproval.sh`).
+* the claim check (`USE_CLAIM_CHECK`) and its codec server.
 
 The worker still honours `TEMPORAL_TASK_QUEUE_OPEN_ACCOUNT` (see `scripts/startlocalworker.sh <queue>`),
-so another port's Java worker can run the open-account workflow. The Go client also reads
-`TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE` and the TLS settings from the environment, so the worker and
-API can reach Temporal Cloud, but there are no scripts or docs for it yet.
+so another port's Java worker can run the open-account workflow.
+
+The Temporal Cloud scripts are included: see
+[Running the demo on Temporal Cloud](docs/temporal.md#running-the-demo-on-temporal-cloud).
 
 ## Prerequisites
 

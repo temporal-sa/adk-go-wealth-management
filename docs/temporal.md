@@ -106,6 +106,42 @@ Then send the approval, quoting the ID:
 Ask the agent for the status: it reads it with `get_account_opening_status`, and reports
 `Complete`.
 
+## Running the demo on Temporal Cloud
+
+The worker, the API and the compliance script read the Temporal connection from the environment.
+Copy the example file and fill in your namespace and its mTLS client certificate and key:
+
+```bash
+cp setcloudenv.example setcloudenv.sh
+```
+
+`setcloudenv.sh` sets `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE`, `TEMPORAL_TLS_CLIENT_CERT_PATH` and
+`TEMPORAL_TLS_CLIENT_KEY_PATH`. It is git-ignored: never commit it. (The Go SDK also reads
+`TEMPORAL_API_KEY`, if your namespace uses an API key instead of mTLS.)
+
+Start Redis, then each of these in its own terminal, from the repository root:
+
+```bash
+./scripts/startcloudworker.sh
+```
+
+```bash
+./scripts/startcloudapi.sh
+```
+
+```bash
+cd frontend && npm install && npm start
+```
+
+Send compliance approval with the Cloud script, quoting the workflow ID:
+
+```bash
+./scripts/cloudsendcomplianceapproval.sh "OpenAccount-<chat workflow ID>-123-Vacation-1"
+```
+
+Watch the workflows in the Temporal Cloud UI, in your namespace. `startcloudworker.sh <queue>` moves the
+open-account workflow onto another task queue, as `startlocalworker.sh <queue>` does.
+
 ## How account opening works
 
 * `open_new_investment_account` first runs `validate_new_account`. A deposit under $100 or over
@@ -168,6 +204,7 @@ Scenario 2 changes Don Doe's last name to Doenut, so reset the data afterwards w
 | `GEMINI_MODEL` | `gemini-3.8-flash` | worker, CLI | The Gemini model every agent uses |
 | `TEMPORAL_ADDRESS` | `127.0.0.1:7233` | all | Temporal service address |
 | `TEMPORAL_NAMESPACE` | `default` | all | Temporal namespace |
+| `TEMPORAL_TLS_CLIENT_CERT_PATH`, `TEMPORAL_TLS_CLIENT_KEY_PATH` | none | all | mTLS client certificate and key, for Temporal Cloud. Set in `setcloudenv.sh`. |
 | `TEMPORAL_TASK_QUEUE` | `Supervisor` | worker, API | Task queue of the chat workflow and the tool activities |
 | `TEMPORAL_TASK_QUEUE_OPEN_ACCOUNT` | the chat's queue | worker, runner | Task queue of the open-account workflow. `startlocalworker.sh <queue>` sets it; the worker then doesn't run that workflow. |
 | `TEMPORAL_TASK_QUEUE_LLM` | `<TEMPORAL_TASK_QUEUE>-llm` | worker | Task queue of the model calls |
