@@ -17,6 +17,7 @@ import (
 )
 
 func main() {
+	log.Println(config.ClaimCheckStatus())
 	cfg := config.Load()
 	opts, err := config.ClientOptions()
 	if err != nil {

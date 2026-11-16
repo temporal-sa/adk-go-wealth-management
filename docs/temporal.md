@@ -125,7 +125,8 @@ cp setclaimcheck.example setclaimcheck.sh
 `setclaimcheck.sh` sets `USE_CLAIM_CHECK=true` and where Redis is. It is git-ignored. Every start
 script sources it if it exists, so the worker, the API, the compliance and open-account scripts, the
 codec server and the Java worker all use the codec. They must: a component without it can't read the
-others' payloads. Restart anything already running after you create or delete the file.
+others' payloads. Restart anything already running after you create or delete the file. Every program prints a
+`Claim check: ON` or `Claim check: OFF` line when it starts, so you can check they agree.
 
 The demo uses one Redis for the chat events, the chaos flags and the claim check. A claim check adds a
 Redis call for every payload, and Redis being down then stops the workflows, so use a reliable Redis in

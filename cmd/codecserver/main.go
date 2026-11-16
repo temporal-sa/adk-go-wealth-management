@@ -11,6 +11,7 @@ import (
 	"go.temporal.io/sdk/converter"
 
 	"github.com/temporal-sa/adk-go-wealth-management/internal/claimcheck"
+	"github.com/temporal-sa/adk-go-wealth-management/internal/config"
 	"github.com/temporal-sa/adk-go-wealth-management/internal/redisx"
 )
 
@@ -21,6 +22,7 @@ var allowedOrigins = map[string]bool{
 }
 
 func main() {
+	log.Println(config.ClaimCheckStatus())
 	rdb := redisx.NewClient()
 	defer rdb.Close()
 	handler := converter.NewPayloadCodecHTTPHandler(claimcheck.New(rdb))
@@ -29,6 +31,8 @@ func main() {
 	if addr == "" {
 		addr = "127.0.0.1:8081"
 	}
+	// It decodes claim-checked payloads whatever USE_CLAIM_CHECK says, so it can show the
+	// history of runs that had the claim check on.
 	log.Printf("Claim-check codec server on http://%s (POST /encode, POST /decode)", addr)
 	log.Fatal(http.ListenAndServe(addr, cors(handler)))
 }

@@ -17,6 +17,7 @@ import (
 )
 
 func main() {
+	log.Println(config.ClaimCheckStatus())
 	if len(os.Args) != 2 || os.Args[1] == "" {
 		fmt.Fprintln(os.Stderr, "You must specify a workflow ID")
 		os.Exit(1)

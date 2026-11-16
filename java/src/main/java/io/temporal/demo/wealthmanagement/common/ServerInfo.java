@@ -1,6 +1,7 @@
 package io.temporal.demo.wealthmanagement.common;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class ServerInfo {
@@ -31,8 +32,18 @@ public class ServerInfo {
         return getEnv("TEMPORAL_TASK_QUEUE_OPEN_ACCOUNT", getTaskqueue());
     }
 
+    // Accepts the same values as the Go and Python components (true, t, yes, y or 1, in any case),
+    // so they all agree on whether payloads are claim-checked.
     public static Boolean useClaimCheck() {
-        return Boolean.parseBoolean(getEnv("USE_CLAIM_CHECK", "false"));
+        String value = getEnv("USE_CLAIM_CHECK", "false").trim().toLowerCase(Locale.ROOT);
+        return value.equals("true") || value.equals("t") || value.equals("yes") || value.equals("y") || value.equals("1");
+    }
+
+    // A one-line description of whether the claim check is on, logged at startup whatever its state.
+    public static String claimCheckStatus() {
+        String value = System.getenv("USE_CLAIM_CHECK");
+        String setting = value == null || value.isEmpty() ? "USE_CLAIM_CHECK is not set" : "USE_CLAIM_CHECK=" + value;
+        return (useClaimCheck() ? "Claim check: ON (" : "Claim check: OFF (") + setting + ")";
     }
 
     public static Map<String, String> getServerInfo() {

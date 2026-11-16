@@ -5,6 +5,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -69,6 +70,20 @@ func ClientOptions() (client.Options, error) {
 		opts.DataConverter = claimcheck.DataConverter(redisx.NewClient())
 	}
 	return opts, nil
+}
+
+// ClaimCheckStatus describes whether the claim-check codec is on, for every program to
+// print at startup, whatever USE_CLAIM_CHECK says.
+func ClaimCheckStatus() string {
+	v := os.Getenv("USE_CLAIM_CHECK")
+	setting := "USE_CLAIM_CHECK is not set"
+	if v != "" {
+		setting = "USE_CLAIM_CHECK=" + v
+	}
+	if UseClaimCheck() {
+		return fmt.Sprintf("Claim check: ON (%s; payloads stored in Redis at %s)", setting, redisx.Addr())
+	}
+	return fmt.Sprintf("Claim check: OFF (%s)", setting)
 }
 
 // UseClaimCheck reports whether the claim-check codec is on (USE_CLAIM_CHECK is true, yes or 1).

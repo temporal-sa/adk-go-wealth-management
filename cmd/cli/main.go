@@ -23,6 +23,7 @@ import (
 
 func main() {
 	ctx := context.Background()
+	fmt.Println(config.ClaimCheckStatus() + ". The standalone chat doesn't use Temporal, so it has no payloads to claim-check.")
 	if os.Getenv("GEMINI_API_KEY") == "" && os.Getenv("GOOGLE_API_KEY") == "" {
 		log.Fatalln("Set GEMINI_API_KEY first (see setgeminikey.example).")
 	}

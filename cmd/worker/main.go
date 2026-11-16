@@ -25,6 +25,7 @@ import (
 )
 
 func main() {
+	log.Println(config.ClaimCheckStatus())
 	cfg := config.Load()
 	opts, err := config.ClientOptions()
 	if err != nil {
@@ -88,7 +89,7 @@ func main() {
 		log.Println("Warning: GEMINI_API_KEY is not set, so the agents can't call the model " +
 			"(see setgeminikey.example). The open-account workflow doesn't need it.")
 	}
-	log.Printf("Temporal %s, namespace %s, claim check: %v", opts.HostPort, namespace(opts), config.UseClaimCheck())
+	log.Printf("Temporal %s, namespace %s", opts.HostPort, namespace(opts))
 	log.Printf("Worker on task queue %s; model calls (%s) on %s, max calls per second: %s",
 		cfg.TaskQueue, cfg.GeminiModel, cfg.TaskQueueLLM, rate(cfg.LLMMaxCallsPerSecond))
 

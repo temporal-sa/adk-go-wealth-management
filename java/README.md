@@ -7,10 +7,13 @@ and compliance steps, same saga (create the account record, debit the linked ban
 with the custodian, with compensations in reverse order), and the same status updates signalled to the
 parent chat workflow.
 
-This folder is copied unchanged from the reference port
+This folder is copied from the reference port
 ([temporal-sa/oai-temporal-wealth-management](https://github.com/temporal-sa/oai-temporal-wealth-management)),
-and every port shares it. Some code comments still say the activities are in Python; in this port
-they are the Go worker's.
+and every port shares it. Its workflow contract is unchanged. Two small changes in
+`common/ServerInfo.java` and `claimcheck/TemporalOptionsConfig.java`: the worker logs whether the
+claim check is on or off at startup, and `USE_CLAIM_CHECK` accepts `true`, `yes` or `1`, like the Go
+components (the reference accepts only `true`). Some code comments still say the activities are in
+Python; in this port they are the Go worker's.
 
 The workflow has no business logic of its own. It calls the activities by name (`get_client`,
 `open_investment`, `remove_investment`, `debit_linked_account`, `credit_linked_account`,

@@ -8,6 +8,25 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// Addr describes where Redis is, from the same settings as NewClient, without the password.
+func Addr() string {
+	if url := os.Getenv("REDIS_URL"); url != "" {
+		if opts, err := redis.ParseURL(url); err == nil {
+			return opts.Addr
+		}
+		return "REDIS_URL (unparseable)"
+	}
+	host := os.Getenv("REDIS_HOST")
+	if host == "" {
+		host = "localhost"
+	}
+	port := os.Getenv("REDIS_PORT")
+	if port == "" {
+		port = "6379"
+	}
+	return host + ":" + port
+}
+
 // NewClient returns a Redis client. REDIS_URL (redis://:<password>@<host>:<port>/<db>)
 // wins when it is set; otherwise REDIS_HOST, REDIS_PORT and the optional
 // REDIS_PASSWORD are used. With nothing set, it is an unauthenticated Redis on

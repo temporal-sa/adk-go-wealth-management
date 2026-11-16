@@ -29,6 +29,7 @@ public class TemporalOptionsConfig {
             @Override
             public WorkflowClientOptions.Builder customize(
                     @Nonnull WorkflowClientOptions.Builder optionsBuilder) {
+                logger.info(ServerInfo.claimCheckStatus());
                 // wire up the codec server
                 if (ServerInfo.useClaimCheck()) {
                     logger.info("***> Wiring up Claim Check Codec");
