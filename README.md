@@ -1,3 +1,11 @@
+> [!IMPORTANT]
+> **This repository is no longer maintained.** The Google ADK (Go) version of the Wealth Management demo now lives in
+> [temporal-sa/wealth-management-demo](https://github.com/temporal-sa/wealth-management-demo), under
+> [`src/go/google_adk`](https://github.com/temporal-sa/wealth-management-demo/tree/main/src/go/google_adk). There it sits
+> alongside the same demo in twelve other agent frameworks across Python, TypeScript, Go, Java and .NET, with one shared
+> web UI and new features such as a chaos panel for injecting failures. New work, fixes and SDK upgrades happen there;
+> this repository is kept as it is for reference.
+
 # Wealth Management Agent Example using Google ADK for Go
 
 A multi-agent banking chat that shows what Temporal adds to an agent framework. It is the Go port
